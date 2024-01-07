@@ -39,9 +39,7 @@ struct SwiftJsonQuery: ParsableCommand {
             throw JsonQueryError.jsonPathEvaluationError
         }
 
-        guard let resultJsonString = try? JSONSerialization.data(withJSONObject: result as Any, options: [.prettyPrinted, .sortedKeys]) else {
-            return
-        }
+        let resultJsonString = try JSONSerialization.data(withJSONObject: result as Any, options: [.prettyPrinted, .sortedKeys])
 
         let output = String(decoding: resultJsonString, as: UTF8.self)
 
