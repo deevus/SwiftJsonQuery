@@ -1,5 +1,14 @@
 import Foundation
 import ArgumentParser
+import SwiftPath
+
+enum JsonQueryError: Error {
+    case invalidJsonPath(_ path: String)
+    case invalidJsonInput
+    case fileReadError
+    case dataError
+    case jsonPathEvaluationError
+}
 
 @main
 struct SwiftJsonQuery: ParsableCommand {
@@ -10,27 +19,33 @@ struct SwiftJsonQuery: ParsableCommand {
     var fileName: String
 
     func run() throws {
-        let jsonPathDict = self.jsonPathToDictionary(self.jsonPath)
-
-        let fileContents = try String(contentsOfFile: self.fileName, encoding: .utf8)
-
-        guard let data = fileContents.data(using: .utf8) else { return }
-
-        guard let jsonObject = try JSONSerialization.jsonObject(with: data) as? [String: Any] else { return }
-
-        var result: [String: Any] = jsonObject
-
-        for (key) in jsonPathDict {
-            guard let child = result[key] as? [String: Any] else { return }
-
-            result = child
+        guard let jsonPath = JsonPath(self.jsonPath) else {
+            throw JsonQueryError.invalidJsonPath(self.jsonPath)
         }
 
-        guard let prettyPrintedJson = try? JSONSerialization.data(withJSONObject: result, options: .prettyPrinted) else {
+        guard let fileContents = try String(contentsOfFile: self.fileName, encoding: .utf8) as String? else { 
+            throw JsonQueryError.fileReadError
+        }
+
+        guard let data = fileContents.data(using: .utf8) else { 
+            throw JsonQueryError.dataError 
+        }
+
+        guard let jsonObject = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+            throw JsonQueryError.invalidJsonInput
+        }
+
+        guard let result = try jsonPath.evaluate(with: jsonObject) else {
+            throw JsonQueryError.jsonPathEvaluationError
+        }
+
+        guard let resultJsonString = try? JSONSerialization.data(withJSONObject: result as Any, options: [.prettyPrinted, .sortedKeys]) else {
             return
         }
 
-        print(String(decoding: prettyPrintedJson, as: UTF8.self))
+        let output = String(decoding: resultJsonString, as: UTF8.self)
+
+        print(output)
     }
 
     func jsonPathToDictionary(_ jsonPath: String) -> [String] {
