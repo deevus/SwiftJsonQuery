@@ -31,13 +31,13 @@ struct ConsoleOutput {
 
     private mutating func treeToString(_ tree: Tree) -> String {
         tree.rootNode?.enumerateChildren { block in 
-            treeToStringRecursive(node: block, level: 0)
+            treeToStringRecursive(node: block)
         }
 
         return output;
     }
 
-    private mutating func treeToStringRecursive(node: Node, level: Int) {
+    private mutating func treeToStringRecursive(node: Node) {
         var indent = String(repeating: "    ", count: currentIndent)
 
         switch node.nodeType {
@@ -60,8 +60,8 @@ struct ConsoleOutput {
 
             output.append("\(indent)\(AnsiColours.blue.rawValue)\(jsonString.substring(with: key.range))")
 
-            treeToStringRecursive(node: separator, level: level)
-            treeToStringRecursive(node: value, level: level)
+            treeToStringRecursive(node: separator)
+            treeToStringRecursive(node: value)
             return
         case "string": 
             output.append("\(AnsiColours.green.rawValue)\(jsonString.substring(with: node.range))")
@@ -76,7 +76,7 @@ struct ConsoleOutput {
         }
 
         node.enumerateChildren { block in 
-            treeToStringRecursive(node: block, level: level + 1)
+            treeToStringRecursive(node: block)
         }
     }
 }
