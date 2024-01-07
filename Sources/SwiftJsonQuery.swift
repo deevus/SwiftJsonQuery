@@ -31,8 +31,10 @@ struct SwiftJsonQuery: ParsableCommand {
             throw JsonQueryError.jsonPathEvaluationError
         }
 
-        var output = try ConsoleOutput.init(result)
+        var consoleOutput = try ConsoleOutput.init(result)
 
-        print("\u{001B}[0;33m\(try output.string())")
+        let output = try consoleOutput.string()
+
+        print(output)
     }
 }
