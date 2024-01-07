@@ -37,10 +37,4 @@ struct SwiftJsonQuery: ParsableCommand {
 
         print(output)
     }
-
-    func jsonPathToDictionary(_ jsonPath: String) -> [String] {
-        jsonPath.split(separator: ".").map { segment in 
-            String(segment)
-        }
-    }
 }
