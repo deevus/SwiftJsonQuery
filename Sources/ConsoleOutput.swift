@@ -58,17 +58,17 @@ struct ConsoleOutput {
             let separator = node.child(at: 1)!
             let value = node.child(at: 2)!
 
-            output.append("\(indent)\(AnsiColours.blue.rawValue)\(jsonString.substring(with: key.range))")
+            output.append("\(indent)\(AnsiColours.blue.rawValue)\(jsonString[key.stringRange(in: jsonString)])")
 
             treeToStringRecursive(node: separator)
             treeToStringRecursive(node: value)
             return
         case "string": 
-            output.append("\(AnsiColours.green.rawValue)\(jsonString.substring(with: node.range))")
+            output.append("\(AnsiColours.green.rawValue)\(jsonString[node.stringRange(in: jsonString)])")
         case "true":
-            output.append("\(AnsiColours.magenta.rawValue)\(jsonString.substring(with: node.range))")
+            output.append("\(AnsiColours.magenta.rawValue)\(jsonString[node.stringRange(in: jsonString)])")
         case "false":
-            output.append("\(AnsiColours.magenta.rawValue)\(jsonString.substring(with: node.range))")
+            output.append("\(AnsiColours.magenta.rawValue)\(jsonString[node.stringRange(in: jsonString)])")
         default:
             #if debug 
             debugPrint("Unknown node type: \(node.nodeType!)")
